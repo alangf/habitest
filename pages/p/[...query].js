@@ -3,13 +3,13 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 
 import { getProductImage, getProductVariants, getProductVariantById } from '../../lib/product'
-import { getProduct } from '../../lib/api'
+import { getProduct, getTaxon } from '../../lib/api'
 
 import useProduct from '../../hooks/useProduct'
 
 import ProductView from '../../components/ProductView'
 
-export default function ProductPage({ product: ssrProduct, isLoading, isError, query, variant}) {
+export default function ProductPage({ product: ssrProduct, isError, query, variant, taxon}) {
   const router = useRouter();
 
   // Check product cache.
@@ -81,6 +81,7 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
           variants={getProductVariants(product)}
           variant={selectedVariant}
           onVariantChange={id => selectVariant(id)}
+          taxon={taxon}
         />)
     }
     return null;
@@ -123,7 +124,8 @@ export async function getStaticProps({ params }) {
     isError: false,
     isLoading: false,
     query: '',
-    variant: ''
+    variant: '',
+    taxon: null
   }
 
   // We need product ID or slug.
@@ -145,10 +147,16 @@ export async function getStaticProps({ params }) {
       props.variant = query.length === 2 && getProductVariantById(props.product, query[1]) !== null
         ? query[1]
         : props.product.data.relationships.default_variant.data.id;
+
+      if (props.product?.data.relationships.taxons?.data?.length) {
+        // Get product taxonomy.
+        const taxon = await getTaxon(props.product.data.relationships.taxons?.data[0].id);
+        props.taxon = taxon?.data?.attributes?.pretty_name;
+      }
     }
   }
   catch (error) {
-    console.error(error);
+    console.log(error);
     props.isError = true;
   }
   finally {

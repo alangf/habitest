@@ -15,7 +15,8 @@ function ProductView({
   image,
   variant,
   variants,
-  onVariantChange
+  onVariantChange,
+  taxon
 }) {
   return (
     <section className="product-view p-4 m-4 md:mx-auto overflow-hidden bg-white shadow-lg border-1 border-gray-400 rounded-lg md:max-w-2xl lg:max-w-3xl">
@@ -31,9 +32,12 @@ function ProductView({
               />
           )}
         </div>
-        <div className="md:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
-          <h2 className="text-sm title-font text-gray-500 tracking-widest">{brand}</h2>
-          <h1 className="text-3xl title-font font-medium mb-2">{name}</h1>
+        <div className="md:w-1/2 w-full lg:pl-5 lg:py-6 mt-6 lg:mt-0">
+          <div className="text-xs inline-block text-gray-500 mb-1 title-font">
+            {taxon}
+          </div>
+          <h1 className="text-3xl title-font font-medium">{name}</h1>
+          <h2 className="text-md title-font text-gray-500 tracking-widest mb-3">{brand}</h2>
           <p className="leading-relaxed mb-3">
             {description}
           </p>
@@ -87,7 +91,8 @@ ProductView.propTypes = {
   ]),
   variant: PropTypes.shape(),
   variants: PropTypes.array,
-  onVariantChange: PropTypes.func
+  onVariantChange: PropTypes.func,
+  taxon: PropTypes.string
 }
 
 ProductView.defaultProps = {
@@ -103,7 +108,8 @@ ProductView.defaultProps = {
     id: ''
   },
   variants: [],
-  onVariantChange: () => {}
+  onVariantChange: () => {},
+  taxon: null
 }
 
   export default ProductView;
