@@ -2,14 +2,14 @@ import { Fragment, useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { getProductImage, getProductVariants, getProductVariantById } from '../../lib/product'
+import { getProductImage, getProductVariants, getProductVariantById, getProductVariantImages } from '../../lib/product'
 import { getProduct, getTaxon } from '../../lib/api'
 
 import useProduct from '../../hooks/useProduct'
 
 import ProductView from '../../components/ProductView'
 
-export default function ProductPage({ product: ssrProduct, isError, query, variant, taxon}) {
+export default function ProductPage({ product: ssrProduct, isError, query, variant, taxon, gallery}) {
   const router = useRouter();
 
   // Check product cache.
@@ -82,6 +82,7 @@ export default function ProductPage({ product: ssrProduct, isError, query, varia
           variant={selectedVariant}
           onVariantChange={id => selectVariant(id)}
           taxon={taxon}
+          gallery={gallery}
         />)
     }
     return null;
@@ -125,7 +126,8 @@ export async function getStaticProps({ params }) {
     isLoading: false,
     query: '',
     variant: '',
-    taxon: null
+    taxon: null,
+    gallery: []
   }
 
   // We need product ID or slug.
@@ -153,6 +155,8 @@ export async function getStaticProps({ params }) {
         const taxon = await getTaxon(props.product.data.relationships.taxons?.data[0].id);
         props.taxon = taxon?.data?.attributes?.pretty_name;
       }
+
+      props.gallery = getProductVariantImages(props.product, props.variant);
     }
   }
   catch (error) {

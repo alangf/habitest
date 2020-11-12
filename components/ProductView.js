@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import Button from './Button'
 import Dropdown from './Dropdown'
+import ProductGallery from './ProductGallery'
 
 function ProductView({
   name,
@@ -16,20 +17,15 @@ function ProductView({
   variant,
   variants,
   onVariantChange,
-  taxon
+  taxon,
+  gallery
 }) {
   return (
     <section className="product-view p-4 m-4 md:mx-auto overflow-hidden bg-white shadow-lg border-1 border-gray-400 rounded-lg md:max-w-2xl lg:max-w-3xl">
       <div className="md:flex content-center justify-center">
-        <div className="w-1/2 sm:w-1/3 md:w-1/2 mx-auto">
-          {image && (
-            <Image 
-              alt={`Imagen para ${name}`}
-              className="max-w-full object-cover object-center rounded border border-gray-200"
-              src={image.url}
-              width={image.width}
-              height={image.height}
-              />
+        <div className="md:w-1/2 mx-auto">
+          {gallery && (
+            <ProductGallery images={gallery} />
           )}
         </div>
         <div className="md:w-1/2 w-full lg:pl-5 lg:py-6 mt-6 lg:mt-0">
@@ -81,18 +77,20 @@ ProductView.propTypes = {
   purchasable: PropTypes.bool,
   in_stock: PropTypes.bool,
   backorderable: PropTypes.bool,
-  image: PropTypes.oneOf([
-    PropTypes.shape({
-      url: PropTypes.string,
-      width: PropTypes.string,
-      height: PropTypes.string,
-    }),
-    null
-  ]),
+  image: PropTypes.shape({
+    url: PropTypes.string,
+    width: PropTypes.string,
+    height: PropTypes.string,
+  }),
   variant: PropTypes.shape(),
   variants: PropTypes.array,
   onVariantChange: PropTypes.func,
-  taxon: PropTypes.string
+  taxon: PropTypes.string,
+  gallery: PropTypes.arrayOf(PropTypes.shape({
+    url: PropTypes.string,
+    width: PropTypes.string,
+    height: PropTypes.string,
+  }))
 }
 
 ProductView.defaultProps = {
@@ -109,7 +107,8 @@ ProductView.defaultProps = {
   },
   variants: [],
   onVariantChange: () => {},
-  taxon: null
+  taxon: null,
+  gallery: []
 }
 
   export default ProductView;
