@@ -17,7 +17,6 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
   const [selectedVariant, setSelectedVariant] = useState(getProductVariantById(product, variant));
 
   useEffect(() => {
-    console.log({variant});
     setSelectedVariant(getProductVariantById(product, variant));
   }, [variant]);
 
@@ -26,6 +25,13 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
       router.replace('/p/notfound');
     }
   }, [isError]);
+
+  const selectVariant= id => {
+    setSelectedVariant(getProductVariantById(product, id));
+
+    // Keep url updated, variants have their own url.
+    router.push(`/p/${query}/${id}`, `/p/${query}/${id}`, { shallow: true });
+  }
 
   /**
    * Render ProductView component when product is loaded.
@@ -52,6 +58,12 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
           }
         } 
       } = product;
+
+      // Select first image from product.
+      let productFirstImage = null;
+      if (selectedVariant?.relationships?.images?.data) {
+        productFirstImage = getProductImage(product, selectedVariant.relationships.images.data[0].id);
+      }
       return (
         <ProductView
           name={name}
@@ -64,8 +76,10 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
           in_stock={in_stock}
           backorderable={backorderable}
           slug={slug}
-          image={getProductImage(product)}
+          image={productFirstImage}
           variants={getProductVariants(product)}
+          variant={selectedVariant}
+          onVariantChange={id => selectVariant(id)}
         />)
     }
     return null;
@@ -126,7 +140,7 @@ export async function getStaticProps({ params }) {
     } else {
       props.product = res;
 
-      // Set selected variant from url or use default.
+      // Set selected variant from url (if valid) or use default.
       props.variant = query.length === 2 && getProductVariantById(props.product, query[1]) !== null
         ? query[1]
         : props.product.data.relationships.default_variant.data.id;
