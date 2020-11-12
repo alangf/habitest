@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
 
-import { fetcher } from '../../../utils'
+import { fetcher } from '../../../lib/utils'
 
 const { BACKEND_API_URL } = getConfig().serverRuntimeConfig;
 

@@ -1,13 +1,12 @@
 import { Fragment, useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import getConfig from 'next/config'
+
+import { getProductImage } from '../../lib/product'
 
 import useProduct, { getProduct } from '../../hooks/useProduct'
 
 import ProductView from '../../components/ProductView'
-
-const { BASE_IMAGE_URL } = getConfig().publicRuntimeConfig;
 
 export default function ProductPage({ product: ssrProduct, isLoading, isError, query}) {
   const router = useRouter();
@@ -20,23 +19,6 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
       router.replace('/p/notfound');
     }
   }, [isError]);
-
-  /**
-   * Get last image from images array.
-   */
-  const getProductImage = () => {
-    try {
-      const images = product.included[0].attributes.styles;
-      const lastImage = images[images.length - 1];
-      return {
-          ...lastImage,
-          url: `${BASE_IMAGE_URL}${lastImage.url}`
-        }
-    }
-    catch (err) {
-      return null;
-    }
-  }
 
   /**
    * Render ProductView component when product is loaded.
@@ -71,7 +53,7 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
           in_stock={in_stock}
           backorderable={backorderable}
           slug={slug}
-          image={getProductImage()}
+          image={getProductImage(product)}
         />)
     }
     return null;

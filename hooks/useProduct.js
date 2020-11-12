@@ -1,6 +1,6 @@
 import getConfig from 'next/config'
 import useSWR from 'swr'
-import { fetcher } from '../utils'
+import { fetcher } from '../lib/utils'
 
 const { API_URL } = getConfig().publicRuntimeConfig;
 
