@@ -2,17 +2,24 @@ import { Fragment, useEffect, useState } from 'react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-import { getProductImage } from '../../lib/product'
+import { getProductImage, getProductVariants, getProductVariantById } from '../../lib/product'
 
 import useProduct, { getProduct } from '../../hooks/useProduct'
 
 import ProductView from '../../components/ProductView'
 
-export default function ProductPage({ product: ssrProduct, isLoading, isError, query}) {
+export default function ProductPage({ product: ssrProduct, isLoading, isError, query, variant}) {
   const router = useRouter();
 
   // Check product cache.
   const { product } = useProduct(query, ssrProduct);
+
+  const [selectedVariant, setSelectedVariant] = useState(getProductVariantById(product, variant));
+
+  useEffect(() => {
+    console.log({variant});
+    setSelectedVariant(getProductVariantById(product, variant));
+  }, [variant]);
 
   useEffect(() => {
     if (isError === true) {
@@ -24,22 +31,26 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
    * Render ProductView component when product is loaded.
    */
   const renderProductView = () => {
-    if (product && product.data && product.data.attributes) {
+    if (selectedVariant && product && product.data) {
+      const {
+        attributes: {
+          name,
+          description,
+          display_price,
+          purchasable,
+          in_stock,
+          backorderable,
+          slug,
+        }
+      } = selectedVariant;
       const {
         data: {
           attributes: {
-            name,
             brand,
-            description,
-            display_price,
             meta_description,
             meta_keywords,
-            purchasable,
-            in_stock,
-            backorderable,
-            slug,
           }
-        }
+        } 
       } = product;
       return (
         <ProductView
@@ -54,6 +65,7 @@ export default function ProductPage({ product: ssrProduct, isLoading, isError, q
           backorderable={backorderable}
           slug={slug}
           image={getProductImage(product)}
+          variants={getProductVariants(product)}
         />)
     }
     return null;
@@ -95,7 +107,8 @@ export async function getStaticProps({ params }) {
     product: null,
     isError: false,
     isLoading: false,
-    query
+    query: '',
+    variant: ''
   }
 
   // We need product ID or slug.
@@ -104,12 +117,19 @@ export async function getStaticProps({ params }) {
     return { props }
   }
 
+  props.query = query[0];
+
   try {
-    const res = await getProduct(query);
+    const res = await getProduct(query[0]);
     if (res.error) {
-      props.isError = true
+      props.isError = true;
     } else {
-      props.product = res
+      props.product = res;
+
+      // Set selected variant from url or use default.
+      props.variant = query.length === 2 && getProductVariantById(props.product, query[1]) !== null
+        ? query[1]
+        : props.product.data.relationships.default_variant.data.id;
     }
   }
   catch (error) {
