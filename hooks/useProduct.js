@@ -1,6 +1,5 @@
 import getConfig from 'next/config'
 import useSWR from 'swr'
-import { fetcher } from '../lib/utils'
 
 const { API_URL } = getConfig().publicRuntimeConfig;
 
@@ -18,4 +17,3 @@ export default function useProduct(query, initialData) {
   }
 }
 
-export const getProduct = async (query) => fetcher(`${API_URL}/products/${query}`);

@@ -3,8 +3,9 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 
 import { getProductImage, getProductVariants, getProductVariantById } from '../../lib/product'
+import { getProduct } from '../../lib/api'
 
-import useProduct, { getProduct } from '../../hooks/useProduct'
+import useProduct from '../../hooks/useProduct'
 
 import ProductView from '../../components/ProductView'
 
