@@ -11,8 +11,8 @@ export default function Home() {
 
       <main>
         <h1 className="text-3xl mb-4">Habitest</h1>
-        <Link href="/p/resurrection-conditioner">
-          Sample product
+        <Link href="/p/polvo-bronceante">
+          Sample product: Polvo bronceante
         </Link>
         <br/>
         <Link href="/p/x">
